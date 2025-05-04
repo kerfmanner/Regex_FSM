@@ -1,0 +1,17 @@
+digraph FSM {
+node0 [label="Start"];
+node0 -> node1 [label="If(a)"];
+node1 [label="Ascii('a')"];
+node1 -> node2 [label="Any"];
+node1 -> node3 [label="If(b)"];
+node2 [label="Dot"];
+node2 -> node2 [label="Any"];
+node2 -> node3 [label="If(b)"];
+node3 [label="Ascii('b')"];
+node3 -> node3 [label="If(b)"];
+node3 -> node4 [label="If(c)"];
+node3 -> node5 [label="Any"];
+node4 [label="Ascii('c')"];
+node4 -> node5 [label="Any"];
+node5 [label="Termination"];
+}

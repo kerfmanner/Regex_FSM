@@ -1,0 +1,13 @@
+digraph FSM {
+node0 [label="Start"];
+node0 -> node1 [label="Any"];
+node1 [label="Dot"];
+node1 -> node2 [label="If([aeiou])"];
+node2 [label="CharClass('[aeiou]')"];
+node2 -> node2 [label="If([aeiou])"];
+node2 -> node3 [label="If(z)"];
+node2 -> node4 [label="Any"];
+node3 [label="Ascii('z')"];
+node3 -> node4 [label="Any"];
+node4 [label="Termination"];
+}
