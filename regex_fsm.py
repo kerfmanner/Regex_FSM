@@ -183,7 +183,7 @@ class RegexFSM:
                 necessary = False
             case next_token if next_token == "?":
                 new_state = tmp_next_state
-                new_prev_states = prev_states + [tmp_next_state]
+                new_prev_states = prev_states + [tmp_next_state] if is_necessary else prev_states
                 necessary = False
             case next_token if next_token.isascii():
                 new_state = AsciiState(next_token)
