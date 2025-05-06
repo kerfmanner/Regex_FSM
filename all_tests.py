@@ -4,7 +4,7 @@ regex_pattern1 = "a[^bc]d*e"
 regex_compiler1 = RegexFSM(regex_pattern1)
 assert regex_compiler1.check_string("afde") is True
 assert regex_compiler1.check_string("azzzze") is False
-assert regex_compiler1.check_string("abde") is False      
+assert regex_compiler1.check_string("abde") is False
 assert regex_compiler1.check_string("acde") is False
 assert regex_compiler1.check_string("agde") is True
 assert regex_compiler1.check_string("agggge") is False

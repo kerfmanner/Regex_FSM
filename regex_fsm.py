@@ -1,7 +1,8 @@
 from __future__ import annotations
+
+import string
 from abc import ABC, abstractmethod
 from collections import deque
-import string
 
 
 class State(ABC):
@@ -160,24 +161,15 @@ class RegexFSM:
         match next_token:
             case next_token if next_token.startswith("[") and next_token.endswith("]"):
                 new_state = CharacterBracketClassState(next_token)
-                if is_necessary:
-                    new_prev_states = [tmp_next_state]
-                else:
-                    new_prev_states = prev_states
+                new_prev_states = [tmp_next_state] if is_necessary else prev_states
                 necessary = True
             case next_token if next_token == "TERMINATION":
                 new_state = TerminationState()
-                if is_necessary:
-                    new_prev_states = [tmp_next_state]
-                else:
-                    new_prev_states = prev_states
+                new_prev_states = [tmp_next_state] if is_necessary else prev_states
                 necessary = True
             case next_token if next_token == ".":
                 new_state = DotState()
-                if is_necessary:
-                    new_prev_states = [tmp_next_state]
-                else:
-                    new_prev_states = prev_states
+                new_prev_states = [tmp_next_state] if is_necessary else prev_states
                 necessary = True
             case next_token if next_token == "*":
                 new_state = tmp_next_state
@@ -195,10 +187,7 @@ class RegexFSM:
                 necessary = False
             case next_token if next_token.isascii():
                 new_state = AsciiState(next_token)
-                if is_necessary:
-                    new_prev_states = [tmp_next_state]
-                else:
-                    new_prev_states = prev_states
+                new_prev_states = [tmp_next_state] if is_necessary else prev_states
                 necessary = True
             case _:
                 raise AttributeError("Character is not supported")
@@ -259,13 +248,13 @@ class RegexFSM:
 
         def get_weight(state: State) -> int:
             if isinstance(state, AsciiState):
-                return 'If'+ '(' + state.symbol + ')'
+                return "If" + "(" + state.symbol + ")"
             elif isinstance(state, CharacterBracketClassState):
-                return f'If({state.character_class})'
+                return f"If({state.character_class})"
             elif isinstance(state, DotState):
-                return 'Any'
+                return "Any"
             elif isinstance(state, TerminationState):
-                return 'Any'
+                return "Any"
             else:
                 return 0
 
@@ -302,7 +291,7 @@ class RegexFSM:
         dot_lines.append("}")
         return "\n".join(dot_lines)
 
-# This was used during debugging.
+    # This was used during debugging.
     def __repr__(self):
         stack = [self.curr_state]
         visited = set()
@@ -316,10 +305,8 @@ class RegexFSM:
                     stack.append(connect)
                 visited.add(id(state))
                 if not message:
-                    lines.append(str(state) + ' : '+'None')
+                    lines.append(str(state) + " : " + "None")
                 else:
-                    lines.append(str(state) + ' : ' + ", ".join(message))
+                    lines.append(str(state) + " : " + ", ".join(message))
 
-        return '\n'.join(lines)
-
-
+        return "\n".join(lines)
