@@ -128,7 +128,7 @@ class CharacterBracketClassState(State):
                 i += 1
 
         all_chars = set(string.printable)
-        return list(all_chars - allowed) if negate else list(allowed)
+        return (all_chars - allowed) if negate else (allowed)
 
 
 class RegexFSM:
@@ -153,7 +153,7 @@ class RegexFSM:
         self,
         next_token: str,
         prev_states: list[State],
-        tmp_next_state: State,
+        last_created_state: State,
         is_necessary: bool,
     ) -> State:
         new_state = None
@@ -161,33 +161,36 @@ class RegexFSM:
         match next_token:
             case next_token if next_token.startswith("[") and next_token.endswith("]"):
                 new_state = CharacterBracketClassState(next_token)
-                new_prev_states = [tmp_next_state] if is_necessary else prev_states
+                new_prev_states = [last_created_state] if is_necessary else prev_states
                 necessary = True
             case next_token if next_token == "TERMINATION":
                 new_state = TerminationState()
-                new_prev_states = [tmp_next_state] if is_necessary else prev_states
+                new_prev_states = [last_created_state] if is_necessary else prev_states
                 necessary = True
             case next_token if next_token == ".":
                 new_state = DotState()
-                new_prev_states = [tmp_next_state] if is_necessary else prev_states
+                new_prev_states = [last_created_state] if is_necessary else prev_states
                 necessary = True
             case next_token if next_token == "*":
-                new_state = tmp_next_state
-                tmp_next_state.next_states.append(tmp_next_state)
-                new_prev_states = prev_states + [tmp_next_state]
+                new_state = last_created_state
+                last_created_state.next_states.append(last_created_state)
+                new_prev_states = prev_states + [last_created_state]
                 necessary = False
             case next_token if next_token == "+":
-                new_state = tmp_next_state
-                tmp_next_state.next_states.append(tmp_next_state)
-                new_prev_states = [tmp_next_state]
+                new_state = last_created_state
+                if is_necessary:
+                    new_prev_states = [last_created_state]
+                    last_created_state.next_states.append(last_created_state)
+                else:
+                    new_prev_states = prev_states
                 necessary = False
             case next_token if next_token == "?":
-                new_state = tmp_next_state
-                new_prev_states = prev_states + [tmp_next_state] if is_necessary else prev_states
+                new_state = last_created_state
+                new_prev_states = prev_states + [last_created_state] if is_necessary else prev_states
                 necessary = False
             case next_token if next_token.isascii():
                 new_state = AsciiState(next_token)
-                new_prev_states = [tmp_next_state] if is_necessary else prev_states
+                new_prev_states = [last_created_state] if is_necessary else prev_states
                 necessary = True
             case _:
                 raise AttributeError("Character is not supported")
@@ -221,12 +224,14 @@ class RegexFSM:
         while stack:
             token = stack.popleft()
             if token == "[":
-                start = "["
-                while start != "]" and stack:
+                start = token
+                while start != "]":
+                    if not stack:
+                        raise ValueError("If pattern has [, it should also have ], or the character class has no characters.")
                     start = stack.popleft()
                     token += start
-                    if not stack:
-                        raise ValueError("If pattern has [, it should also have ]")
+
+
             tokens.append(token)
         return tokens
 
@@ -254,9 +259,9 @@ class RegexFSM:
             elif isinstance(state, DotState):
                 return "Any"
             elif isinstance(state, TerminationState):
-                return "Any"
+                return "lambda"
             else:
-                return 0
+                return 'ERROR'
 
         state_ids = {}
         dot_lines = ["digraph FSM {"]
@@ -275,8 +280,10 @@ class RegexFSM:
                 node_id += 1
 
             node_label = get_node_label(current)
-            dot_lines.append(f'{state_ids[current]} [label="{node_label}"];')
-
+            if node_label == "Termination":
+                dot_lines.append(f'{state_ids[current]} [label="{node_label}", peripheries=2];')
+            else:
+                dot_lines.append(f'{state_ids[current]} [label="{node_label}"];')
             for next_state in current.next_states:
                 if next_state not in state_ids:
                     state_ids[next_state] = f"node{node_id}"

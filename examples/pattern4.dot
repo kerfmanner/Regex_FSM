@@ -5,9 +5,9 @@ node1 [label="CharClass('[a-m]')"];
 node1 -> node2 [label="If([^aeiou])"];
 node2 [label="CharClass('[^aeiou]')"];
 node2 -> node3 [label="If([x-z])"];
-node2 -> node4 [label="Any"];
+node2 -> node4 [label="lambda"];
 node3 [label="CharClass('[x-z]')"];
 node3 -> node3 [label="If([x-z])"];
-node3 -> node4 [label="Any"];
-node4 [label="Termination"];
+node3 -> node4 [label="lambda"];
+node4 [label="Termination", peripheries=2];
 }

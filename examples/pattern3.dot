@@ -9,6 +9,6 @@ node2 -> node2 [label="If(q)"];
 node2 -> node3 [label="If(r)"];
 node3 [label="Ascii('r')"];
 node3 -> node3 [label="If(r)"];
-node3 -> node4 [label="Any"];
-node4 [label="Termination"];
+node3 -> node4 [label="lambda"];
+node4 [label="Termination", peripheries=2];
 }

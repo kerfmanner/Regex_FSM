@@ -10,6 +10,6 @@ node3 [label="Ascii('d')"];
 node3 -> node3 [label="If(d)"];
 node3 -> node4 [label="If(e)"];
 node4 [label="Ascii('e')"];
-node4 -> node5 [label="Any"];
-node5 [label="Termination"];
+node4 -> node5 [label="lambda"];
+node5 [label="Termination", peripheries=2];
 }
