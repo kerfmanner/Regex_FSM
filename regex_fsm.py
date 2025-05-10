@@ -26,28 +26,13 @@ class StartState(State):
 
     def __init__(self):
         self.next_states = []
+        self.is_termination = False
 
     def check_self(self, char):
         return super().check_self(char)
 
     def __repr__(self):
         return "StartState"
-
-
-class TerminationState(State):
-
-    def __init__(self):
-        self.next_states = []
-
-    def check_self(self, next_char):
-        return True
-
-    def check_next(self, next_char):
-        return []
-
-    def __repr__(self):
-        return "TerminationState"
-
 
 class DotState(State):
     """
@@ -56,6 +41,7 @@ class DotState(State):
 
     def __init__(self):
         self.next_states = []
+        self.is_termination = False
 
     def check_self(self, char: str):
         return True
@@ -72,6 +58,7 @@ class AsciiState(State):
     def __init__(self, symbol: str) -> None:
         self.next_states = []
         self.symbol = symbol
+        self.is_termination = False
 
     def check_self(self, curr_char: str) -> bool:
         return curr_char == self.symbol
@@ -92,6 +79,7 @@ class CharacterBracketClassState(State):
         self.next_states = []
         self.character_class = character_class
         self.symbols = self.get_symbols_from_class(character_class)
+        self.is_termination = False
 
     def check_self(self, char):
         for symbol in self.symbols:
@@ -147,7 +135,11 @@ class RegexFSM:
             )
             prev_states = new_prev_states
 
-        self.__init_next_state("TERMINATION", prev_states, tmp_next_state, necessary)
+        if necessary:
+            tmp_next_state.is_termination = True
+        else:
+            for state in new_prev_states:
+                state.is_termination = True
 
     def __init_next_state(
         self,
@@ -161,10 +153,6 @@ class RegexFSM:
         match next_token:
             case next_token if next_token.startswith("[") and next_token.endswith("]"):
                 new_state = CharacterBracketClassState(next_token)
-                new_prev_states = [last_created_state] if is_necessary else prev_states
-                necessary = True
-            case next_token if next_token == "TERMINATION":
-                new_state = TerminationState()
                 new_prev_states = [last_created_state] if is_necessary else prev_states
                 necessary = True
             case next_token if next_token == ".":
@@ -214,7 +202,7 @@ class RegexFSM:
 
             states = new_states
         return any(
-            1 for i in states for j in i.next_states if isinstance(j, TerminationState)
+            1 for i in states if i.is_termination
         )
 
     @staticmethod
@@ -246,8 +234,6 @@ class RegexFSM:
                 return "Dot"
             elif isinstance(state, StartState):
                 return "Start"
-            elif isinstance(state, TerminationState):
-                return "Termination"
             else:
                 return str(state)
 
@@ -257,9 +243,7 @@ class RegexFSM:
             elif isinstance(state, CharacterBracketClassState):
                 return f"If({state.character_class})"
             elif isinstance(state, DotState):
-                return "Any"
-            elif isinstance(state, TerminationState):
-                return "lambda"
+                return "Any()"
             else:
                 return 'ERROR'
 
@@ -280,7 +264,7 @@ class RegexFSM:
                 node_id += 1
 
             node_label = get_node_label(current)
-            if node_label == "Termination":
+            if current.is_termination:
                 dot_lines.append(f'{state_ids[current]} [label="{node_label}", peripheries=2];')
             else:
                 dot_lines.append(f'{state_ids[current]} [label="{node_label}"];')
@@ -317,3 +301,7 @@ class RegexFSM:
                     lines.append(str(state) + " : " + ", ".join(message))
 
         return "\n".join(lines)
+
+pattern = 'ab*[0-9]?d*e+E'
+regex_compiler = RegexFSM(pattern)
+print(regex_compiler.to_dot_file())

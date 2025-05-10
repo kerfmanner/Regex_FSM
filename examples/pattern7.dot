@@ -8,7 +8,5 @@ node2 [label="Ascii('E')"];
 node2 -> node3 [label="If(N)"];
 node3 [label="Ascii('N')"];
 node3 -> node4 [label="If(D)"];
-node4 [label="Ascii('D')"];
-node4 -> node5 [label="lambda"];
-node5 [label="Termination", peripheries=2];
+node4 [label="Ascii('D')", peripheries=2];
 }

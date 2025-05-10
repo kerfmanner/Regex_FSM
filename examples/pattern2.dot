@@ -10,8 +10,6 @@ node2 -> node4 [label="If(b)"];
 node3 [label="CharClass('[0-9]')"];
 node3 -> node3 [label="If([0-9])"];
 node3 -> node4 [label="If(b)"];
-node4 [label="Ascii('b')"];
+node4 [label="Ascii('b')", peripheries=2];
 node4 -> node4 [label="If(b)"];
-node4 -> node5 [label="lambda"];
-node5 [label="Termination", peripheries=2];
 }

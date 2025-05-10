@@ -1,14 +1,12 @@
 digraph FSM {
 node0 [label="Start"];
-node0 -> node1 [label="Any"];
+node0 -> node1 [label="Any()"];
 node0 -> node2 [label="If(q)"];
 node1 [label="Dot"];
 node1 -> node2 [label="If(q)"];
 node2 [label="Ascii('q')"];
 node2 -> node2 [label="If(q)"];
 node2 -> node3 [label="If(r)"];
-node3 [label="Ascii('r')"];
+node3 [label="Ascii('r')", peripheries=2];
 node3 -> node3 [label="If(r)"];
-node3 -> node4 [label="lambda"];
-node4 [label="Termination", peripheries=2];
 }

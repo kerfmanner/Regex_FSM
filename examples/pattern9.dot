@@ -1,14 +1,11 @@
 digraph FSM {
 node0 [label="Start"];
-node0 -> node1 [label="Any"];
+node0 -> node1 [label="Any()"];
 node1 [label="Dot"];
 node1 -> node2 [label="If([^x-z])"];
-node2 [label="CharClass('[^x-z]')"];
+node2 [label="CharClass('[^x-z]')", peripheries=2];
 node2 -> node2 [label="If([^x-z])"];
 node2 -> node3 [label="If([a-c])"];
-node2 -> node4 [label="lambda"];
-node3 [label="CharClass('[a-c]')"];
+node3 [label="CharClass('[a-c]')", peripheries=2];
 node3 -> node3 [label="If([a-c])"];
-node3 -> node4 [label="lambda"];
-node4 [label="Termination", peripheries=2];
 }
