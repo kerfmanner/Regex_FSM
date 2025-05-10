@@ -301,7 +301,3 @@ class RegexFSM:
                     lines.append(str(state) + " : " + ", ".join(message))
 
         return "\n".join(lines)
-
-pattern = 'ab*[0-9]?d*e+E'
-regex_compiler = RegexFSM(pattern)
-print(regex_compiler.to_dot_file())
